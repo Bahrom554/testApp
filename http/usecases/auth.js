@@ -3,7 +3,7 @@ const config = require('../../config/app')()
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 exports.register = async (data) => {
-    let client = await Models.client.findOne({ where: { id: data.id } });
+    let client = await Models.client.findOne({ where: { id: data.id} });
     if (client) {
         await client.update(data);
     } else {
