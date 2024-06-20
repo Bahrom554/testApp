@@ -1,0 +1,35 @@
+version: "3.9"
+services:
+  app:
+    build: .
+    links:
+      - db
+    depends_on:
+      - db
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: always
+
+  db:
+    image: postgres:13.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    restart: always
+    env_file:
+      - .env.db
+  nginx:
+    build:
+      context: ./nginx/
+    volumes:
+      - ./public:/var/www/html/public
+      # - ./ui:/var/www/ui
+    depends_on:
+      - app
+    ports:
+      - "4302:80"
+      # - "4301:8443"
+    restart: always
+
+volumes:
+  postgres_data:
