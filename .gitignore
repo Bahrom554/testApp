@@ -6,3 +6,6 @@ public
 .env.db
 Makefile
 yarn.lock
+*.cert
+*.key
+*.pem

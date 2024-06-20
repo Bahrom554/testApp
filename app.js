@@ -5,6 +5,7 @@ const AppConfiguration = require('./config/app')();
 const cookieParser = require('cookie-parser');
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
+const clientRouter = require('./routes/client');
 const app = express();
 const Util = require('./util/utils');
 
@@ -14,8 +15,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
-app.use('/user', userRouter);
-app.use('/auth', authRouter);
+app.use('/api/user', userRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/client', clientRouter)
 
 app.use((error, req, res, next) => {
     console.log(error);
