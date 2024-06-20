@@ -7,6 +7,7 @@ module.exports = function (sequelize, DataTypes) {
         },
         phone: {
             type: DataTypes.STRING(256),
+            unique: true,
             allowNull: false,
         },
         name: {
