@@ -27,7 +27,7 @@ services:
     depends_on:
       - app
     ports:
-      - "4302:443"
+      - "443:443"
       # - "4301:8443"
     restart: always
 
