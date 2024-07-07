@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   app:
     build: .
@@ -23,12 +22,13 @@ services:
       context: ./nginx/
     volumes:
       - ./public:/var/www/html/public
-      # - ./ui:/var/www/ui
+      - ./index.html:/var/www/html/index.html
+      - ./ui:/var/www/ui
     depends_on:
       - app
     ports:
       - "443:443"
-      # - "4301:8443"
+      - "4301:8443"
     restart: always
 
 volumes:
