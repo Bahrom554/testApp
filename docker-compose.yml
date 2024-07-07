@@ -22,7 +22,7 @@ services:
       context: ./nginx/
     volumes:
       - ./public:/var/www/html/public
-      - ./index.html:/var/www/html/index.html
+      - ./privacy:/var/www/html/privacy
       - ./ui:/var/www/ui
     depends_on:
       - app
