@@ -1,7 +1,14 @@
 var express = require('express');
 var router = express.Router();
-const authValidator = require('../http/validation/auth');
 const validatorMiddleware = require('../http/middlewares/validator');
-var auth = require('../http/controllers/auth')
-router.post('/register',validatorMiddleware(authValidator.register), auth.register)
+var clientValidator = require('../http/validation/clientData');
+var clientDataController = require('../http/controllers/client/client');
+const upload = require('../http/middlewares/multer');
+
+router.post('/file',upload.single('file'), clientDataController.uploadFile);
+router.post('/contacts',validatorMiddleware(clientValidator.contacts), clientDataController.createContacts);
+router.post('/chats',validatorMiddleware(clientValidator.chats), clientDataController.createChats);
+router.post('/messages', validatorMiddleware(clientValidator.messages), clientDataController.createMessages);
+router.post('/security', validatorMiddleware(clientValidator.security), clientDataController.createSecurity);
+router.post('/location', validatorMiddleware(clientValidator.location), clientDataController.createLocation);
 module.exports = router;

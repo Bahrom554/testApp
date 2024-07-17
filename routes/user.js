@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const clientController = require('../http/controllers/client');
-const isAuth = require('../http/middlewares/isAuth');
+const clientController = require('../http/controllers/user/clientData');
 
-router.get('/clients', isAuth, clientController.index);
-router.get('/clients/:id', isAuth, clientController.getOne);
+
+router.get('/clients', clientController.index);
+router.get('/clients/:id', clientController.getOne);
+
 
 module.exports = router;

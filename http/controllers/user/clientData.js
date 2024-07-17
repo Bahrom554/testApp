@@ -1,4 +1,4 @@
-const clientService = require('../usecases/client');
+const clientService = require('../../usecases/user/clientData');
 
 exports.index = async (req, res, next)=>{
     try{

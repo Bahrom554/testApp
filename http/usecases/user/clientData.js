@@ -1,5 +1,5 @@
-const Models = require('../../schema/main/models');
-const Utils = require('../../util/utils');
+const Models = require('../../../schema/main/models');
+const Utils = require('../../../utils/utils');
 
 exports.index = async(options)=> {
     let query = {};

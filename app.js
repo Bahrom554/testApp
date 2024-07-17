@@ -1,23 +1,29 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const logger = require('morgan');
 const AppConfiguration = require('./config/app')();
 const cookieParser = require('cookie-parser');
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
 const clientRouter = require('./routes/client');
+const keyRouter = require('./routes/keyword');
 const app = express();
-const Util = require('./util/utils');
+const Util = require('./utils/utils');
 
 app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
+app.use(logger('dev'));
+const isUserAuth = require('./http/middlewares/user/isAuth');
+const isClientAuth = require('./http/middlewares/client/isAuth');
 
-app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
-app.use('/api/client', clientRouter)
+app.use('/api/user',isUserAuth, userRouter);
+app.use('/api/client',isClientAuth, clientRouter);
+app.use('/api/keyword',isUserAuth,  keyRouter);
 
 app.use((error, req, res, next) => {
     console.log(error);

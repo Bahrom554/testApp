@@ -9,7 +9,16 @@ exports.register = async (data) => {
     } else {
         client = await Models.client.create(data);
     }
-    return { message: 'Success', client: client };
+
+   const token = jwt.sign(
+        {
+            clientId: client.id
+        },
+        config.jwtSecretClient,
+        { expiresIn: '365d' }
+    );
+
+    return {token: token};
 }
 
 
@@ -34,5 +43,5 @@ exports.login = async (data) => {
         { expiresIn: '365d' }
     );
 
-    return token;
+    return {token};
 }

@@ -1,5 +1,4 @@
 const authService = require('../usecases/auth');
-const Models = require('../../schema/main/models');
 
 exports.register = async (req, res, next)=>{
     try{
