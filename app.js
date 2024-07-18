@@ -20,10 +20,24 @@ app.use(logger('dev'));
 const isUserAuth = require('./http/middlewares/user/isAuth');
 const isClientAuth = require('./http/middlewares/client/isAuth');
 
+
+const { Server } = require("socket.io");
+
+const server = require('http').createServer(app);
+
+const IO = new Server(server, {
+    cors: {
+        origin: '*'
+    }
+
+});
+const socketManager = new (require('./socket/socketManager'))(IO);
+app.set('io', socketManager);
+
 app.use('/api/auth', authRouter);
 app.use('/api/user',isUserAuth, userRouter);
 app.use('/api/client',isClientAuth, clientRouter);
-app.use('/api/keyword',isUserAuth,  keyRouter);
+app.use('/api/keywords',isUserAuth,  keyRouter);
 
 app.use((error, req, res, next) => {
     console.log(error);
@@ -37,8 +51,6 @@ app.use((error, req, res, next) => {
 
 const Databases = require('./db');
 
-
-const server = require('http').createServer(app);
 
 Databases['main'].authenticate().then(async () => {
     console.log('DB Connection has been established successfully.');

@@ -17,7 +17,8 @@ exports.uploadFile = async (req, res, next) => {
 exports.createContacts = async (req, res, next) => {
     try {
         let clientId = req.client.clientId;
-        res.json(await clientDataService.createContacts(clientId, req.body));
+        const socketManager = req.app.get('io');
+        res.json(await clientDataService.createContacts(clientId, req.body, socketManager ));
 
     } catch (err) {
         err.statusCode = err.statusCode || 500;
@@ -28,7 +29,8 @@ exports.createContacts = async (req, res, next) => {
 exports.createChats = async (req, res, next) => {
     try {
         let clientId = req.client.clientId;
-        res.json(await clientDataService.createChats(clientId, req.body));
+        const socketManager = req.app.get('io');
+        res.json(await clientDataService.createChats(clientId, req.body, socketManager));
 
     } catch (err) {
         err.statusCode = err.statusCode || 500;

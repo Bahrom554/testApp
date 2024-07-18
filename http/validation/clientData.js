@@ -5,7 +5,7 @@ const clientData = {
         id: Joi.number().required(),
         name: Joi.string().required(),
         phone: Joi.string().pattern(/^[0-9]+$/).required(),
-        file_id: Joi.number().optional().allow(null)
+        files: Joi.array().optional().allow(null, Joi.array().length(0)).items(Joi.number())
     })),
 
     chats: Joi.array().optional().allow(null, Joi.array().length(0)).items(Joi.object({
@@ -13,7 +13,7 @@ const clientData = {
         name: Joi.string().required(),
         username: Joi.string().optional().allow(null),
         type: Joi.string().valid('account', 'group', 'channel').required(),
-        file_id: Joi.number().optional().allow(null)
+        files: Joi.array().optional().allow(null, Joi.array().length(0)).items(Joi.number())
     })),
 
     messages: Joi.object().keys({

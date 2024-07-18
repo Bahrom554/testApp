@@ -27,13 +27,13 @@ exports.create = async function (data) {
 }
 
 exports.update = async function(id, data){
-    let key = Models.keyword.findOne({where: {name: data.name, id: {[Op.ne]: id}}})
+    let key = await Models.keyword.findOne({where: {name: data.name, id: {[Op.ne]: id}}});
      if(key){
         let err = new Error('This keyword has been created!');
         err.statusCode = err.statusCode || 422;
         throw err;
      }
-
+      data.updated_at = Date.now();
      const [updated, keyword] = await Models.keyword.update(data, { where: { id: id }, returning: true });
 
      if (!updated) {
