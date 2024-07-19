@@ -3,5 +3,6 @@ exports.defaults ={
 }
 
 exports.messageKeys = {
- chatMessage: 'chatMessage'
+ chatMessage: 'chatMessage',
+ notifyKeyword: 'notifyKeyword'
 }

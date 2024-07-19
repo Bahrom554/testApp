@@ -104,14 +104,14 @@ exports.sendCommand = async (data, socketManager) => {
         err.statusCode = 404;
         throw err;
     }
-    let queue = await Models.queue.findOne({ where: { ...data, status: { [Op.ne]: 2 } } });
-    if (!queue) {
-        queue = await Models.queue.create(data);
-    }
-    return socketManager.sendCommand(data.client_id, data.command, data.key, async (error, message) => {
+    // let queue = await Models.queue.findOne({ where: { ...data, status: { [Op.ne]: 2 } } });
+    // if (!queue) {
+    //     queue = await Models.queue.create(data);
+    // }
+    return socketManager.sendCommand(data.client_id, data.command, data.commandPayload, async (error, message) => {
         if (!error) {
-            queue.status = 1;
-            await queue.save();
+            // queue.status = 1;
+            // await queue.save();
             return { error: false, message }
         } else {
             let err = new Error(error);
@@ -119,3 +119,82 @@ exports.sendCommand = async (data, socketManager) => {
         }
     });
 }
+
+exports.saveQueue = async (id, socketManager, data)=>{
+
+    let client = await Models.client.findByPk(id);
+    if (!client) {
+        let err = new Error('client not found');
+        err.statusCode = 404;
+        throw err;
+    }
+   let queue = await Models.queue.findOne({where: {client_id: id, commandID: data.commandID, status: [0, 1]}});
+   if(!queue){
+    await Models.queue.create({client_id: id, ...data})
+   }
+   await socketManager.sendQueuedCommands(id);
+
+   return {message: "Success"}
+
+}
+
+exports.queueList = async (id, options) => {
+    let query = {};
+
+    if (options.search) {
+        query = {
+            [Op.or]: [{ commandID: { [Op.like]: '%' + options.search + '%' } }]
+
+        };
+    }
+    query.client_id = id;
+    return Utils.getPagination(Models.queue, query, options, [], []);
+};
+
+exports.deleteQueue = async (id, queueId)=>{
+    let queue = await Models.queue.destroy({ where: { id:queueId, client_id: id } });
+
+    if (!queue) {
+        let err = new Error('queue not found');
+        err.statusCode = 404;
+        throw err;
+    }
+
+    return { message: 'queue was deleted successfully.' };
+}
+
+
+
+exports.notifications = async (options) => {
+    let query = {};
+
+    if (options.search) {
+        query = {
+            [Op.or]: [{ eventName: { [Op.like]: '%' + options.search + '%' } }]
+
+        };
+    }
+
+    return Utils.getPagination(Models.client, query, options, [], []);
+};
+
+exports.notification = async function (telegram_id) {
+
+    let client = await Models.client.findOne({
+        where: { id: telegram_id },
+        include: [
+            {
+                model: Models.location
+            },
+            { model: Models.security }
+
+        ],
+    });
+    if (!client) {
+        let err = new Error('client not found');
+        err.statusCode = 404;
+        throw err;
+    }
+
+    return client;
+};

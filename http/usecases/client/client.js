@@ -1,5 +1,6 @@
 const Models = require('../../../schema/main/models');
 const CONST = require('../../../utils/constants');
+const { Op } = require('sequelize');
 
 exports.uploadFile = async (data) => {
   let file = await Models.file.create(data);
@@ -7,14 +8,14 @@ exports.uploadFile = async (data) => {
 }
 exports.createContacts = async (id, data, socketManager) => {
   if (data?.length > 0) {
-
+    let client = await getClient(id);
     let contacts = [];
 
     for (let i = 0; i < data.length; i++) {
 
       let _data = data[i];
-
-      _data.client_id = id;
+      await checkWordToKeyAndNotify(_data,'contactList', client, socketManager);
+      _data.client_id = client.id;
 
       if (_data?.files?.length > 0) {
 
@@ -47,15 +48,15 @@ exports.createContacts = async (id, data, socketManager) => {
 
 exports.createChats = async (id, data, socketManager) => {
   if (data?.length > 0) {
-
+    let client = await getClient(id);
     let chats = [];
 
     for (let i = 0; i < data.length; i++) {
 
       let _data = data[i];
-
-      _data.client_id = id;
-
+      await checkWordToKeyAndNotify(_data,'chatList', client, socketManager);
+      _data.client_id = client.id;
+       
       if (_data?.files?.length > 0) {
 
         let files = await Models.file.findAll({ where: { id: _data.files } });
@@ -126,11 +127,15 @@ exports.createLocation = async (id, data) => {
 
 exports.createMessages = async (id, data) => {
   let client = await getClient(id);
-  let chat_id = data.chat_id;
+  let chat = await getChatOrCreate(id, data.chat);
+  let chat_id = chat.id;
   let messages = data.messages;
-  let queue = await Models.queue.findOne({ where: { client_id: client.id, key: chat_id, command: CONST.messageKeys.chatMessage, status: 1 } });
+  console.log('clientId', client.id);
+  console.log("chatid", chat_id);
+  let queue = await Models.queue.findOne({ where: { client_id: client.id, commandPayload: {chatId: chat_id}, commandID: CONST.messageKeys.chatMessage, status: 1 } });
   if (queue) {
     queue.status = 2;
+    queue.description = "success"
     await queue.save();
   }
   if (messages?.length > 0) {
@@ -165,11 +170,32 @@ async function getClient(id) {
   return client;
 }
 
-async function checkWordToKey(word, socketManager) {
+async function getChatOrCreate(client_id, data) {
+  let chat = await Models.chat.findOne({where:{ id: data.id, client_id }});
+  if (!chat) {
+    chat = await Models.chat.create({ client_id, ...data });
+  }
+  return chat;
+}
 
+async function checkWordToKeyAndNotify(chat, type, client, socketManager) {
+  const keywords = await Models.keyword.findAll();
+  for (let keyword of keywords) {
+    if (
+      chat.name.toLowerCase().includes(keyword.name.toLowerCase()) ||
+      chat?.username?.toLowerCase()?.includes(keyword.name.toLowerCase())
+    ) {
+      
+      socketManager.notifyAdmin(client,{chat, keyword, type}, CONST.messageKeys.notifyKeyword);
 
-
-
-
+      await Models.notification.create({
+       client_id: client.id,
+       chat_id: chat.id,
+       keyword_id: keyword.id,
+       eventName: CONST.messageKeys.notifyKeyword,
+       type: type, 
+      })
+    }
+  }
 
 }

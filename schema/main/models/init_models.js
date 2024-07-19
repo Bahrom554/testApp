@@ -9,6 +9,7 @@ const _keyword = require('./keywor');
 const _location = require('./location')
 const _security = require('./security');
 const _queue = require('./queue');
+const _notification = require('./notification');
 
 function initModels(sequelize) {
     const client = _client(sequelize, DataTypes);
@@ -21,6 +22,7 @@ function initModels(sequelize) {
     const location = _location(sequelize, DataTypes);
     const security = _security(sequelize, DataTypes);
     const queue = _queue(sequelize, DataTypes);
+    const notification = _notification(sequelize, DataTypes);
 
     client.hasMany(contact, { as: 'contacts', foreignKey: 'client_id' });
     client.hasMany(chat, { as: 'chats', foreignKey: 'client_id' });
@@ -33,6 +35,8 @@ function initModels(sequelize) {
     client.hasMany(message, { as: 'messages', foreignKey: 'client_id' });
     message.belongsTo(chat, { as: 'chat', foreignKey: 'chat_id' });
     message.belongsTo(chat, { as: 'writer', foreignKey: 'writer_id' });
+    notification.belongsTo(client);
+    notification.belongsTo(keyword);
 
 
     return {
@@ -45,7 +49,8 @@ function initModels(sequelize) {
         keyword,
         location,
         security,
-        queue
+        queue,
+        notification
     }
 
 }

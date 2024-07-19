@@ -17,17 +17,21 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             defaultValue: 0 // 0 waiting, 1 sent, 2 finish
         },
-        command: {
+        commandID: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        params: {
+        commandPayload: {
             type: DataTypes.JSONB,
             allowNull: true
         },
         key: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: true
+        },
+        description:{
+            type: DataTypes.STRING,
+            allowNull: true
         },
         try_count: {
             type: DataTypes.INTEGER,
@@ -47,10 +51,6 @@ module.exports = (sequelize, DataTypes) => {
     },{
         sequelize,
         tableName: 'queues',
-        timestamps: false,
-        indexes:[{
-            fields:['client_id', 'command','key','status'],
-            unique: true
-        }]
+        timestamps: false
     })
 }

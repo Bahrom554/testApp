@@ -100,12 +100,14 @@ class SocketManager {
 
             let clientID = clientParams.clientId || null;
     
-            clients.set(clientID, socket.id);
+            if(clientID){
+                clients.set(clientID, socket.id);
 
+                await this.sendQueuedCommands(clientID);
 
-            console.log("Socket connected clients:", clients);
-
-
+                console.log("Socket connected clients:", clients);
+            }
+            
             socket.on('disconnect', async function () {
 
                 const key = clients.search(socket.id);
@@ -129,10 +131,11 @@ class SocketManager {
         userIO.emit('notification', { eventName, client, data })
     }
 
-     sendCommand(client_id, command, key, cb = () => {
+     sendCommand(client_id, commandId, commandPayload, cb = () => {
     }) {
         if (clients.has(client_id)){
-            clientIO.to(clients.get(client_id)).emit(command, {key});
+            clientIO.to(clients.get(client_id)).emit(commandId, commandPayload);
+            console.log("soket requested");
             return cb(false, 'requested');
         }
         else{
@@ -140,8 +143,88 @@ class SocketManager {
         }
         
     }
+
+    async sendQueuedCommands(client_id) {
+
+        console.log("QUEUE UPDATE");
+
+        let activeJob = await Models.queue.findOne({where:{ client_id, status: 1 }});
+        console.log(activeJob?.toJSON());
+
+        if (!activeJob) {
+            await sendNextJob(client_id);
+        } else {
+            await checkActiveJobIfOKSendItAgainOrSendNewJob(activeJob, client_id);
+        }
+
+    }
     
 }
+async function sendNextJob(client_id) {
+    let nextJob = await Models.queue.findOne({where:{ client_id, status: 0 }})
+    console.log("NEXT JOB IF NO ACTIVE JOB")
+    console.log(nextJob?.toJSON())
+    if (nextJob) {
+        console.log("CLIENTS")
+        console.log(clients)
+        console.log(clients.has(client_id));
+        if (clients.has(client_id)) {
+
+            console.log("SOCKET CLIENT")
+            console.log(clients.get(client_id))
+            clientIO.to(clients.get(client_id)).emit(nextJob.commandID, nextJob.commandPayload)
+            console.log("\n\n\nNEXT JOB COMMAND SENT TO CLIENT")
+            console.log(nextJob?.toJSON())
+            console.log("\n\n\n")
+            nextJob.status = 1;
+            nextJob.updated_at = new Date();
+            await nextJob.save();
+
+        }
+
+    }
+}
+
+
+
+async function checkActiveJobIfOKSendItAgainOrSendNewJob(activeJob, client_id) {
+
+    let timeDifferenceInMillis = new Date().getTime() - new Date(activeJob.created_at).getTime();
+    console.log("time",new Date())
+    console.log("time cre", new Date(activeJob.created_at))
+    let timeDifferenceInMins = timeDifferenceInMillis / (60 * 1000);
+    let lastTryDifferenceinMins = (new Date().getTime() - new Date(activeJob.updated_at).getTime()) / (60 * 1000);
+    console.log("TIMES")
+    console.log(timeDifferenceInMins)
+    console.log(lastTryDifferenceinMins)
+
+    if (timeDifferenceInMins > 2) {
+        if (activeJob.try_count <= 3 && lastTryDifferenceinMins >= 2) {
+            if (clients.has(client_id)) {
+                clientIO.to(clients.get(client_id)).emit(activeJob.commandID, activeJob.commandPayload)
+                console.log("\n\n\nOLD ACTIVE JOB SENT TO CLIENT")
+                console.log(activeJob?.toJSON())
+                activeJob.try_count = activeJob.try_count + 1;
+                activeJob.updated_at = new Date();
+                await activeJob.save();
+            }
+        } else {
+            activeJob.status = 2;
+            activeJob.description = "some error with client sending data";
+            await activeJob.save();
+            await sendNextJob(client_id);
+        }
+
+
+    }
+    console.log("\n\n\n")
+    console.log(activeJob?.toJSON())
+}
+
+
+
+
+
 
 
 module.exports = SocketManager;

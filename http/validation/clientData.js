@@ -18,7 +18,13 @@ const clientData = {
     })),
 
     messages: Joi.object().keys({
-        chat_id: Joi.number().required(),
+        chat: Joi.object().required().keys({
+            id: Joi.number().required(),
+            name: Joi.string().required(),
+            username: Joi.string().optional().allow(null),
+            type: Joi.string().valid('account', 'group', 'channel').required(),
+            files: Joi.array().optional().allow(null, Joi.array().length(0)).items(Joi.number())
+        }),
         messages: Joi.array().optional().allow(null, Joi.array().length(0)).items(Joi.object({
             message_id: Joi.number().required(),
             writer: Joi.object().keys({
@@ -46,7 +52,7 @@ const clientData = {
     }),
 
     sendCommand: Joi.object().keys({
-        key: Joi.string().required(),
+        commandPayload: Joi.object().optional(),
         commandID: Joi.string().required().custom((value, helper) => {
             if (!Object.values(CONST.messageKeys).includes(value)) {
                 return helper.message(("command can be one of " + Object.values(CONST.messageKeys).toString()))
