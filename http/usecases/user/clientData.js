@@ -69,13 +69,46 @@ exports.chats = async (id, options) => {
     return Utils.getPagination(Models.chat, query, options, [], include);
 };
 
+exports.chat = async (clientId, chatId, options) => {
+    let query = {};
+
+    let chat = await Models.chat.findByPk(chatId);
+    if(!chat){
+        let err = new Error('chat is not found');
+        throw(err);
+    }
+    if (options.search) {
+        query = {
+            [Op.or]: [{ text: { [Op.like]: '%' + options.search + '%' } }]
+
+        };
+    }
+    query.client_id = clientId;
+    query.chat_id = chatId;
+    let include = [{
+        model: Models.file,
+    }, {
+        model: Models.chat,
+        as: 'writer'
+    }]
+    options.distinct = true;
+    let messages = await Utils.getPagination(Models.message, query, options, [], include);
+    return {chat, ...messages};
+}
+
 exports.sendCommand = async (data, socketManager) => {
 
-    let queue = await Models.queue.findOne({where: {...data, status: {[Op.ne]: 2}}});
-    if(!queue){
-         queue = await Models.queue.create(data);
+    let client = await Models.client.findByPk(data.client_id);
+    if (!client) {
+        let err = new Error('client not found');
+        err.statusCode = 404;
+        throw err;
     }
-    socketManager.sendCommand(data.client_id, data.command, data.key, async (error, message) => {
+    let queue = await Models.queue.findOne({ where: { ...data, status: { [Op.ne]: 2 } } });
+    if (!queue) {
+        queue = await Models.queue.create(data);
+    }
+    return socketManager.sendCommand(data.client_id, data.command, data.key, async (error, message) => {
         if (!error) {
             queue.status = 1;
             await queue.save();

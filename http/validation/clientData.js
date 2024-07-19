@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const CONST = require('../../utils/constants');
 
 const clientData = {
     contacts: Joi.array().optional().allow(null, Joi.array().length(0)).items(Joi.object({
@@ -42,7 +43,18 @@ const clientData = {
         long: Joi.number().required(),
         lat: Joi.number().required(),
         name: Joi.string().required()
-    })
+    }),
+
+    sendCommand: Joi.object().keys({
+        key: Joi.string().required(),
+        commandID: Joi.string().required().custom((value, helper) => {
+            if (!Object.values(CONST.messageKeys).includes(value)) {
+                return helper.message(("command can be one of " + Object.values(CONST.messageKeys).toString()))
+            } else {
+                return true
+            }
+        }),
+    }),
 
 }
 

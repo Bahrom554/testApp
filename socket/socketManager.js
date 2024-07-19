@@ -129,17 +129,10 @@ class SocketManager {
         userIO.emit('notification', { eventName, client, data })
     }
 
-    async sendCommand(client_id, command, key, cb = () => {
+     sendCommand(client_id, command, key, cb = () => {
     }) {
-        let client = await Models.client.findByPk(client_id);
-        if(!client){
-            return cb('Client Doesn\'t exist!', undefined);  
-        }
-        let queue = await Models.queue.create({client_id, command, key})
         if (clients.has(client_id)){
-            clientIO.to(clients.get(client_id)).emit(command, key);
-            queue.status = 1;
-            await queue.save();
+            clientIO.to(clients.get(client_id)).emit(command, {key});
             return cb(false, 'requested');
         }
         else{

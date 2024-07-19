@@ -1,4 +1,5 @@
 const Models = require('../../../schema/main/models');
+const CONST = require('../../../utils/constants');
 
 exports.uploadFile = async (data) => {
   let file = await Models.file.create(data);
@@ -12,7 +13,7 @@ exports.createContacts = async (id, data, socketManager) => {
     for (let i = 0; i < data.length; i++) {
 
       let _data = data[i];
-       
+
       _data.client_id = id;
 
       if (_data?.files?.length > 0) {
@@ -127,6 +128,11 @@ exports.createMessages = async (id, data) => {
   let client = await getClient(id);
   let chat_id = data.chat_id;
   let messages = data.messages;
+  let queue = await Models.queue.findOne({ where: { client_id: client.id, key: chat_id, command: CONST.messageKeys.chatMessage, status: 1 } });
+  if (queue) {
+    queue.status = 2;
+    await queue.save();
+  }
   if (messages?.length > 0) {
     for (let i = 0; i < messages.length; i++) {
       let message = messages[i];
@@ -159,11 +165,11 @@ async function getClient(id) {
   return client;
 }
 
-async function checkWordToKey(word, socketManager){
+async function checkWordToKey(word, socketManager) {
 
 
 
 
 
-  
+
 }

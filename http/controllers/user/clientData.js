@@ -52,10 +52,27 @@ exports.chats = async (req, res, next) => {
     }
 };
 
+
+exports.chat = async (req, res, next) => {
+    try {
+        const client_id = req.params.clientId;
+        const chat_id = req.params.chatId;
+        const search = req.query.search || null;
+        const page = req.query.page || 1;
+        const limit = req.query.limit || 10;
+        res.json(await clientService.chat(client_id, chat_id,{ search, page, limit }));
+
+    } catch (err) {
+        err.statusCode = err.statusCode || 500;
+        next(err);
+    }
+};
+
+
 exports.sendCommand = async (req, res, next) => {
     let socketManager = req.app.get('io');
     try {
-        let client_id = req.params.id;
+        let client_id = req.params.id ;
         let command = req.body.commandID;
         let key = req.body.key;
         res.json(await clientService.sendCommand({ client_id, command, key }, socketManager));
