@@ -179,7 +179,7 @@ async function getChatOrCreate(client_id, data) {
 }
 
 async function checkWordToKeyAndNotify(chat, type, client, socketManager) {
-  const keywords = await Models.keyword.findAll();
+  const keywords = await Models.keyword.findAll({include: Models.category});
   for (let keyword of keywords) {
     if (
       chat.name.toLowerCase().includes(keyword.name.toLowerCase()) ||

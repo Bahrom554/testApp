@@ -8,6 +8,7 @@ const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
 const clientRouter = require('./routes/client');
 const keyRouter = require('./routes/keyword');
+const categoryRouter = require('./routes/category')
 const app = express();
 const Util = require('./utils/utils');
 
@@ -38,6 +39,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/user',isUserAuth, userRouter);
 app.use('/api/client',isClientAuth, clientRouter);
 app.use('/api/keywords',isUserAuth,  keyRouter);
+app.use('/api/category',isUserAuth, categoryRouter);
 
 app.use((error, req, res, next) => {
     console.log(error);

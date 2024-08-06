@@ -1,7 +1,7 @@
-module.exports = function (sequelize, DataTypes) {
-    return sequelize.define('keyword', {
-        id: {
-            type: DataTypes.INTEGER,
+module.exports = function(sequelize, DataTypes){
+    return sequelize.define('category',{
+        id:{
+            type:DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true
         },
@@ -9,14 +9,6 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: false,
             unique: true
-        },
-        category_id: {
-            type: DataTypes.BIGINT,
-            allowNull: true,
-            references: {
-                model: 'categories',
-                key: 'id'
-            }
         },
         created_at: {
             type: DataTypes.DATE,
@@ -30,7 +22,7 @@ module.exports = function (sequelize, DataTypes) {
         }
     }, {
         sequelize,
-        tableName: 'keywords',
+        tableName: 'categories',
         timestamps: false
     })
 }

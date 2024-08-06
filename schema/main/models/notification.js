@@ -18,7 +18,7 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.BIGINT,
             allowNull: true,
             references: {
-                model: 'keywors',
+                model: 'keywords',
                 key: 'id'
             }
         },

@@ -1,12 +1,12 @@
 const Models = require('../../../schema/main/models');
 const Utils = require('../../../utils/utils');
-const {Op} = require('sequelize');
+const { Op } = require('sequelize');
 
 exports.index = async function (options) {
     let query = {};
 
     if (options.search) {
-        query.username = {
+        query.name = {
             [Op.like]: '%' + options.search + '%',
         };
     }
@@ -15,6 +15,15 @@ exports.index = async function (options) {
 }
 
 exports.create = async function (data) {
+
+    if (data.category_id) {
+        let category = await Models.category.findByPk(data.category_id);
+        if (!category) {
+            let err = new Error('category not found');
+            err.statusCode = err.statusCode || 422;
+            throw err;
+        }
+    }
     let key = await Models.keyword.findOne({ where: { name: data.name } });
     if (key) {
         let err = new Error('This keyword has been created!');
@@ -26,23 +35,23 @@ exports.create = async function (data) {
     return await Models.keyword.create(data);
 }
 
-exports.update = async function(id, data){
-    let key = await Models.keyword.findOne({where: {name: data.name, id: {[Op.ne]: id}}});
-     if(key){
+exports.update = async function (id, data) {
+    let key = await Models.keyword.findOne({ where: { name: data.name, id: { [Op.ne]: id } } });
+    if (key) {
         let err = new Error('This keyword has been created!');
         err.statusCode = err.statusCode || 422;
         throw err;
-     }
-      data.updated_at = Date.now();
-     const [updated, keyword] = await Models.keyword.update(data, { where: { id: id }, returning: true });
+    }
+    data.updated_at = Date.now();
+    const [updated, keyword] = await Models.keyword.update(data, { where: { id: id }, returning: true });
 
-     if (!updated) {
-         let err = new Error('keyword not found');
-         err.statusCode = 404;
-         throw err;
-     }
- 
-     return keyword[0];
+    if (!updated) {
+        let err = new Error('keyword not found');
+        err.statusCode = 404;
+        throw err;
+    }
+
+    return keyword[0];
 }
 
 exports.delete = async function (id) {
