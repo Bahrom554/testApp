@@ -5,7 +5,8 @@ exports.index = async (req, res, next) => {
         const search = req.query.search || null;
         const page = req.query.page || 1;
         const limit = req.query.limit || 10;
-        res.json(await keyWordService.index({ search, page, limit }))
+        const category_id = req.query.category_id || null;
+        res.json(await keyWordService.index({ search, page, limit, category_id }))
     } catch (err) {
         err.statusCode = err.statusCode || 500;
         next(err);

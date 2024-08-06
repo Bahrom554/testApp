@@ -4,7 +4,7 @@ const { Op } = require('sequelize');
 
 exports.index = async function (options) {
     let query = {};
-
+    
     if (options.search) {
         query.name = {
             [Op.like]: '%' + options.search + '%',
