@@ -35,7 +35,8 @@ module.exports = function (sequelize, DataTypes) {
             }
         },
         is_seen: {
-         type: DataTypes.BOOLEAN
+         type: DataTypes.BOOLEAN,
+         defaultValue: false
         },
         created_at: {
             type: DataTypes.DATE,

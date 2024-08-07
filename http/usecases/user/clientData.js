@@ -167,34 +167,32 @@ exports.deleteQueue = async (id, queueId)=>{
 
 exports.notifications = async (options) => {
     let query = {};
-
+     
     if (options.search) {
         query = {
             [Op.or]: [{ eventName: { [Op.like]: '%' + options.search + '%' } }]
 
         };
     }
+    query.is_seen = false;
+    let include = [{model: Models.client},{model: Models.keyword, include: [{model: Models.category, as:'categories'}]}]
 
-    return Utils.getPagination(Models.client, query, options, [], []);
+    return Utils.getPagination(Models.notification, query, options, [], include);
 };
 
-exports.notification = async function (telegram_id) {
+exports.notification = async function (id) {
 
-    let client = await Models.client.findOne({
-        where: { id: telegram_id },
-        include: [
-            {
-                model: Models.location
-            },
-            { model: Models.security }
-
-        ],
+    let not = await Models.notification.findOne({
+        where: { id: id},
+        include: [{model: Models.client},{model: Models.keyword, include: [{model: Models.category, as:'categories'}]}],
     });
-    if (!client) {
-        let err = new Error('client not found');
+    if (!not) {
+        let err = new Error('notification not found');
         err.statusCode = 404;
         throw err;
     }
 
-    return client;
+    not.is_seen = true;
+    await not.save();
+    return not;
 };

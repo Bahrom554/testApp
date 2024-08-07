@@ -10,14 +10,6 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             unique: true
         },
-        category_id: {
-            type: DataTypes.BIGINT,
-            allowNull: true,
-            references: {
-                model: 'categories',
-                key: 'id'
-            }
-        },
         created_at: {
             type: DataTypes.DATE,
             allowNull: false,

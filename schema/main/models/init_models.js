@@ -36,12 +36,12 @@ function initModels(sequelize) {
     client.hasMany(message, { as: 'messages', foreignKey: 'client_id' });
     message.belongsTo(chat, { as: 'chat', foreignKey: 'chat_id' });
     message.belongsTo(chat, { as: 'writer', foreignKey: 'writer_id' });
-    notification.belongsTo(client);
-    notification.belongsTo(keyword);
+    notification.belongsTo(client, {foreignKey: 'client_id'});
+    notification.belongsTo(keyword, {foreignKey: 'keyword_id'});
 
-    category.hasMany(keyword, {as:'keywors', foreignKey: 'category_id'});
-    keyword.belongsTo(category,{foreignKey: 'category_id'});
-    
+    category.belongsToMany(keyword, { as: 'keywords', through: 'keywordCategory' });
+    keyword.belongsToMany(category, { as: 'categories', through: 'keywordCategory' });
+
 
 
     return {

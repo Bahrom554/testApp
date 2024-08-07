@@ -4,9 +4,6 @@ const { Op } = require('sequelize');
 
 exports.index = async function (options) {
     let query = {};
-    if(options.category_id){
-        query.category_id = options.category_id;
-    }
     if (options.search) {
         query.name = {
             [Op.like]: '%' + options.search + '%',
@@ -17,15 +14,14 @@ exports.index = async function (options) {
 }
 
 exports.create = async function (data) {
-
-    if (data.category_id) {
+    
         let category = await Models.category.findByPk(data.category_id);
         if (!category) {
             let err = new Error('category not found');
             err.statusCode = err.statusCode || 422;
             throw err;
         }
-    }
+    
     let key = await Models.keyword.findOne({ where: { name: data.name } });
     if (key) {
         let err = new Error('This keyword has been created!');
@@ -33,8 +29,10 @@ exports.create = async function (data) {
         throw err;
 
     }
+    key = await Models.keyword.create(data);
+    await key.addCategory(category);
 
-    return await Models.keyword.create(data);
+    return key;
 }
 
 exports.update = async function (id, data) {
