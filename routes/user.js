@@ -8,6 +8,7 @@ const clientDataValidator = require('../http/validation/clientData');
 router.get('/clients', clientController.index);
 router.get('/clients/notifications', clientController.notifications);
 router.get('/clients/notifications/:id', clientController.notification);
+router.get('/clients/:id/notifications', clientController.clientNotification);
 router.get('/clients/:id', clientController.getOne);
 router.get('/clients/:id/contacts', clientController.contacts);
 router.get('/clients/:id/chats', clientController.chats);

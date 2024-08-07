@@ -38,6 +38,7 @@ function initModels(sequelize) {
     message.belongsTo(chat, { as: 'writer', foreignKey: 'writer_id' });
     notification.belongsTo(client, {foreignKey: 'client_id'});
     notification.belongsTo(category, {foreignKey: 'category_id'});
+    notification.belongsTo(chat, {foreignKey: 'chat_id'});
 
     // category.belongsToMany(keyword, { as: 'keywords', through: 'keywordCategory' });
     // keyword.belongsToMany(category, { as: 'categories', through: 'keywordCategory' });

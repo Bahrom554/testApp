@@ -60,7 +60,7 @@ exports.chat = async (req, res, next) => {
         const search = req.query.search || null;
         const page = req.query.page || 1;
         const limit = req.query.limit || 10;
-        res.json(await clientService.chat(client_id, chat_id,{ search, page, limit }));
+        res.json(await clientService.chat(client_id, chat_id, { search, page, limit }));
 
     } catch (err) {
         err.statusCode = err.statusCode || 500;
@@ -72,7 +72,7 @@ exports.chat = async (req, res, next) => {
 exports.sendCommand = async (req, res, next) => {
     let socketManager = req.app.get('io');
     try {
-        let client_id = req.params.id ;
+        let client_id = req.params.id;
         let command = req.body.commandID;
         let commandPayload = req.body.commandPayload;
         res.json(await clientService.sendCommand({ client_id, command, commandPayload }, socketManager));
@@ -86,21 +86,21 @@ exports.sendCommand = async (req, res, next) => {
 exports.saveQueue = async function (req, res, next) {
     let socketManager = req.app.get('io');
 
-       try{
+    try {
 
         let client_id = req.params.id;
-         res.json(await clientService.saveQueue(client_id, socketManager, req.body))
+        res.json(await clientService.saveQueue(client_id, socketManager, req.body))
 
 
-       }catch(err){
+    } catch (err) {
         err.statusCode = err.statusCode || 500;
         next(err);
-    
+
     }
-    
+
 }
 
-exports.queueList = async function(req, res, next){
+exports.queueList = async function (req, res, next) {
     try {
         const id = req.params.id;
         const search = req.query.search || null;
@@ -114,7 +114,7 @@ exports.queueList = async function(req, res, next){
     }
 }
 
-exports.deleteQueue = async function(req, res, next){
+exports.deleteQueue = async function (req, res, next) {
 
     const id = req.params.id;
     const queueId = req.params.queueId;
@@ -151,3 +151,17 @@ exports.notification = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.clientNotification = async (req, res, next) => {
+    try {
+        const search = req.query.search || null;
+        const page = req.query.page || 1;
+        const limit = req.query.limit || 10;
+        const id = req.params.id;
+        res.json(await clientService.clientNotification(id, { search, page, limit }));
+
+    } catch (err) {
+        err.statusCode = err.statusCode || 500;
+        next(err);
+    }
+}

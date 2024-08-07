@@ -128,7 +128,7 @@ class SocketManager {
 
     notifyAdmin(client, data, eventName) {
         
-        userIO.emit('notification', { eventName, client, data })
+        userIO.emit('notification', { eventName, client, ...data })
     }
 
      sendCommand(client_id, commandId, commandPayload, cb = () => {

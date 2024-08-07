@@ -184,7 +184,7 @@ exports.notification = async function (id) {
 
     let not = await Models.notification.findOne({
         where: { id: id},
-        include: [{model: Models.client},{model: Models.category}],
+        include: [{model: Models.client},{model: Models.category},{model: Models.chat}],
     });
     if (!not) {
         let err = new Error('notification not found');
@@ -196,3 +196,18 @@ exports.notification = async function (id) {
     await not.save();
     return not;
 };
+
+exports.clientNotification = async (id, options)=>{
+    let query = {};
+     
+    if (options.search) {
+        query = {
+            [Op.or]: [{ eventName: { [Op.like]: '%' + options.search + '%' } }]
+
+        };
+    }
+    query.client_id = id;
+    let include = [{model: Models.category}]
+
+    return Utils.getPagination(Models.notification, query, options, [], include);
+}

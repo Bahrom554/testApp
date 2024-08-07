@@ -13,6 +13,10 @@ module.exports = function (sequelize, DataTypes) {
         chat_id: {
             type: DataTypes.BIGINT,
             allowNull: true,
+            references: {
+                model: 'chats',
+                key: 'id'
+            }
         },
         category_id: {
             type: DataTypes.BIGINT,
