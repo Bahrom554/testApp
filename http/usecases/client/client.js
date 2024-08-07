@@ -179,23 +179,30 @@ async function getChatOrCreate(client_id, data) {
 }
 
 async function checkWordToKeyAndNotify(chat, type, client, socketManager) {
-  const keywords = await Models.keyword.findAll({include: [{model: Models.category, as: 'categories'}]});
-  for (let keyword of keywords) {
-    if (
-      chat.name.toLowerCase().includes(keyword.name.toLowerCase()) ||
-      chat?.username?.toLowerCase()?.includes(keyword.name.toLowerCase())
-    ) {
-      
-      socketManager.notifyAdmin(client,{chat, keyword, type}, CONST.messageKeys.notifyKeyword);
+  const categories = await Models.category.findAll({});
+  for (let category of categories) {
+    if (category.keywords && category.keywords.length > 0) {
+      for (keyword of category.keywords) {
+        if (
+          chat.name.toLowerCase().includes(keyword.toLowerCase()) ||
+          chat?.username?.toLowerCase()?.includes(keyword.toLowerCase())
+        ) {
 
-      await Models.notification.create({
-       client_id: client.id,
-       chat_id: chat.id,
-       keyword_id: keyword.id,
-       eventName: CONST.messageKeys.notifyKeyword,
-       type: type, 
-      })
+          socketManager.notifyAdmin(client, { chat, category,keyword, type }, CONST.messageKeys.notifyKeyword);
+
+          await Models.notification.create({
+            client_id: client.id,
+            chat_id: chat.id,
+            category_id: category.id,
+            keyword: keyword,
+            eventName: CONST.messageKeys.notifyKeyword,
+            type: type,
+          })
+        }
+      }
     }
+
+
   }
 
 }

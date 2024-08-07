@@ -14,13 +14,17 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.BIGINT,
             allowNull: true,
         },
-        keyword_id: {
+        category_id: {
             type: DataTypes.BIGINT,
             allowNull: true,
             references: {
-                model: 'keywords',
+                model: 'categories',
                 key: 'id'
             }
+        },
+        keyword: {
+            type: DataTypes.STRING(256),
+            allowNull: true
         },
         type: {
             type: DataTypes.STRING(256),
@@ -35,8 +39,8 @@ module.exports = function (sequelize, DataTypes) {
             }
         },
         is_seen: {
-         type: DataTypes.BOOLEAN,
-         defaultValue: false
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
         },
         created_at: {
             type: DataTypes.DATE,

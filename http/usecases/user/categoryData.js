@@ -10,9 +10,9 @@ exports.index = async function (options) {
             [Op.like]: '%' + options.search + '%',
         };
     }
-    let include = [{model: Models.keyword, as:'keywords'}]
+    
 
-    return Utils.getPagination(Models.category, query, options, [], include)
+    return Utils.getPagination(Models.category, query, options, [], [])
 }
 
 exports.create = async function (data) {
@@ -23,22 +23,8 @@ exports.create = async function (data) {
         throw err;
 
     }
-    category = await Models.category.create(data);
-    if (data.keywords && data.keywords.length > 0) {
-        let keywords = data.keywords;
-        let _keywors = [];
-        for (let i = 0; i < keywords.length; i++) {
-            let name = keywords[i];
-            let keyword = await Models.keyword.findOne({ where: { name } });
-            if (!keyword) {
-                keyword = await Models.keyword.create({ name });
-            }
-            _keywors.push(keyword);
-        }
-        await category.addKeywords(_keywors);
-    }
-
-    return await Models.category.findOne({ where: {id: category.id }, include: [{model: Models.keyword, as:'keywords'}] });
+    
+    return await Models.category.create(data);
 }
 
 exports.update = async function (id, data) {

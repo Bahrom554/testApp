@@ -38,7 +38,7 @@ app.set('io', socketManager);
 app.use('/api/auth', authRouter);
 app.use('/api/user',isUserAuth, userRouter);
 app.use('/api/client',isClientAuth, clientRouter);
-app.use('/api/keywords',isUserAuth,  keyRouter);
+// app.use('/api/keywords',isUserAuth,  keyRouter);
 app.use('/api/category',isUserAuth, categoryRouter);
 
 app.use((error, req, res, next) => {

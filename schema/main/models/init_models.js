@@ -5,7 +5,7 @@ const _chat = require('./chat');
 const _contact = require('./contact');
 const _file = require('./file');
 const _message = require('./message');
-const _keyword = require('./keywor');
+// const _keyword = require('./keywor');
 const _location = require('./location')
 const _security = require('./security');
 const _queue = require('./queue');
@@ -18,7 +18,7 @@ function initModels(sequelize) {
     const contact = _contact(sequelize, DataTypes);
     const file = _file(sequelize, DataTypes);
     const message = _message(sequelize, DataTypes);
-    const keyword = _keyword(sequelize, DataTypes);
+    // const keyword = _keyword(sequelize, DataTypes);
     const location = _location(sequelize, DataTypes);
     const security = _security(sequelize, DataTypes);
     const queue = _queue(sequelize, DataTypes);
@@ -37,10 +37,10 @@ function initModels(sequelize) {
     message.belongsTo(chat, { as: 'chat', foreignKey: 'chat_id' });
     message.belongsTo(chat, { as: 'writer', foreignKey: 'writer_id' });
     notification.belongsTo(client, {foreignKey: 'client_id'});
-    notification.belongsTo(keyword, {foreignKey: 'keyword_id'});
+    notification.belongsTo(category, {foreignKey: 'category_id'});
 
-    category.belongsToMany(keyword, { as: 'keywords', through: 'keywordCategory' });
-    keyword.belongsToMany(category, { as: 'categories', through: 'keywordCategory' });
+    // category.belongsToMany(keyword, { as: 'keywords', through: 'keywordCategory' });
+    // keyword.belongsToMany(category, { as: 'categories', through: 'keywordCategory' });
 
 
 
@@ -51,7 +51,7 @@ function initModels(sequelize) {
         contact,
         file,
         message,
-        keyword,
+        // keyword,
         location,
         security,
         queue,

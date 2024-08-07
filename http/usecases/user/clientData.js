@@ -175,7 +175,7 @@ exports.notifications = async (options) => {
         };
     }
     query.is_seen = false;
-    let include = [{model: Models.client},{model: Models.keyword, include: [{model: Models.category, as:'categories'}]}]
+    let include = [{model: Models.client},{model: Models.category}]
 
     return Utils.getPagination(Models.notification, query, options, [], include);
 };
@@ -184,7 +184,7 @@ exports.notification = async function (id) {
 
     let not = await Models.notification.findOne({
         where: { id: id},
-        include: [{model: Models.client},{model: Models.keyword, include: [{model: Models.category, as:'categories'}]}],
+        include: [{model: Models.client},{model: Models.category}],
     });
     if (!not) {
         let err = new Error('notification not found');
