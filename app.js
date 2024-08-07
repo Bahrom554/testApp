@@ -8,7 +8,10 @@ const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
 const clientRouter = require('./routes/client');
 const keyRouter = require('./routes/keyword');
-const categoryRouter = require('./routes/category')
+const categoryRouter = require('./routes/category');
+const fs = require('fs');
+const CONST = require('./utils/constants');
+const dir = CONST.defaults.UPLOAD_DIR;
 const app = express();
 const Util = require('./utils/utils');
 
@@ -59,6 +62,9 @@ Databases['main'].authenticate().then(async () => {
     Databases['main'].sync({ alter: true });
     await Util.seedUser();
     server.listen(AppConfiguration.appPort, async function () {
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, {recursive: true});
+        }
         console.log(`We are running on port ${AppConfiguration.appPort}!`);
     });
 }).catch((error) => {
